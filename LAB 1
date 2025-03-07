@@ -1,142 +1,140 @@
 using System;
 
-namespace FractionCalculator
+public class Program
 {
-    public class NotCorrectlyDenominatorException : ArgumentException
+    public static void Main(string[] args)
     {
-        public NotCorrectlyDenominatorException(string message) : base(message) { }
+        // Задание1 Демонстрация класса дробей 
+        Console.WriteLine("Задание 1: Демонстрация класса дробей");
+        Fraction f1 = new Fraction(1, 2);
+        Fraction f2 = new Fraction(1, 4);
+
+        Console.WriteLine($"{f1} + {f2} = {f1 + f2}");
+        Console.WriteLine($"{f1} - {f2} = {f1 - f2}");
+        Console.WriteLine($"{f1} * {f2} = {f1 * f2}");
+        Console.WriteLine($"{f1} / {f2} = {f1 / f2}");
+
+
+        // Задание 2 Демонстрация свойств и (частично) Задание 3 и 4 теперь в Fraction.Main
+
+        // Задание 5 и 6 я продемонстрирую при создании новых объектов Fraction.
+
+    }
+}
+
+// Задание 6*: Собственный класс исключения
+public class NotCorrectlyDenominatorException : ArgumentException
+{
+    public NotCorrectlyDenominatorException(string message) : base(message) { }
+}
+
+public class Fraction
+{
+    private int numerator;
+    private int denominator;
+
+    // Задание 1: Конструктор (и расширяется в следующих заданиях)
+    public Fraction(int numerator, int denominator)
+    {
+        // Задание 4 и 6*: Проверка знаменателя
+        if (denominator == 0)
+        {
+            throw new NotCorrectlyDenominatorException("Знаменатель не может быть равен 0");
+        }
+
+        this.numerator = numerator;
+        this.denominator = denominator;
+
+        // Задание 5: Упрощение дроби при создании
+        Simplify();
     }
 
-    public class Fraction
+    // Задание 2: Свойства для доступа к числителю и знаменателю
+    public int Numerator
     {
-        private int numerator;
-        private int denominator;
+        get { return numerator; }
+        set { numerator = value; Simplify(); } // Упрощаем при изменении числителя
+    }
 
-        public int Numerator
+    public int Denominator
+    {
+        get { return denominator; }
+        set
         {
-            get { return numerator; }
-            set { numerator = value; Simplify(); }
-        }
-
-        public int Denominator
-        {
-            get { return denominator; }
-            set
-            {
-                if (value == 0)
-                {
-                    throw new NotCorrectlyDenominatorException("Знаменатель не может быть равен 0");
-                }
-                denominator = value;
-                Simplify();
-            }
-        }
-
-        public double DecimalValue => (double)Numerator / Denominator; // Свойство только для чтения
-
-        public Fraction(int numerator, int denominator)
-        {
-            if (denominator == 0)
+            if (value == 0)
             {
                 throw new NotCorrectlyDenominatorException("Знаменатель не может быть равен 0");
             }
-
-            this.numerator = numerator;
-            this.denominator = denominator;
-            Simplify();
-        }
-
-        private static int GCD(int a, int b)
-        {
-            while (b != 0)
-            {
-                int temp = b;
-                b = a % b;
-                a = temp;
-            }
-            return Math.Abs(a);
-        }
-
-        private void Simplify()
-        {
-            int gcd = GCD(numerator, denominator);
-            numerator /= gcd;
-            denominator /= gcd;
-
-            if (denominator < 0)
-            {
-                numerator = -numerator;
-                denominator = -denominator;
-            }
-        }
-
-        public static Fraction operator +(Fraction a, Fraction b)
-        {
-            return new Fraction(a.Numerator * b.Denominator + b.Numerator * a.Denominator, a.Denominator * b.Denominator);
-        }
-
-        public static Fraction operator -(Fraction a, Fraction b)
-        {
-            return new Fraction(a.Numerator * b.Denominator - b.Numerator * a.Denominator, a.Denominator * b.Denominator);
-        }
-
-        public static Fraction operator *(Fraction a, Fraction b)
-        {
-            return new Fraction(a.Numerator * b.Numerator, a.Denominator * b.Denominator);
-        }
-
-        public static Fraction operator /(Fraction a, Fraction b)
-        {
-            if (b.Numerator == 0)
-            {
-                throw new DivideByZeroException("Деление на 0!");
-            }
-            return new Fraction(a.Numerator * b.Denominator, a.Denominator * b.Numerator);
-        }
-
-
-        public override string ToString()
-        {
-            return $"{Numerator}/{Denominator}";
+            denominator = value;
+            Simplify(); // Упрощаем при изменении знаменателя
         }
     }
 
-    class Program
+    // Задание 3: Свойство только для чтения для получения десятичной дроби
+    public double DecimalValue
     {
-        static void Main(string[] args)
+        get { return (double)numerator / denominator; }
+    }
+
+    // Задание 5: Упрощение дроби (метод)
+    private void Simplify()
+    {
+        int gcd = GreatestCommonDivisor(numerator, denominator);
+        numerator /= gcd;
+        denominator /= gcd;
+
+        // Чтобы знак минус всегда был у числителя.
+        if (denominator < 0)
         {
-            try
-            {
-                Fraction f1 = new Fraction(1, 2);
-                Fraction f2 = new Fraction(1, 4);
-
-                Console.WriteLine($"{f1} + {f2} = {f1 + f2}");
-                Console.WriteLine($"{f1} - {f2} = {f1 - f2}");
-                Console.WriteLine($"{f1} * {f2} = {f1 * f2}");
-                Console.WriteLine($"{f1} / {f2} = {f1 / f2}");
-
-                Console.WriteLine($"{f1} в десятичном виде: {f1.DecimalValue}");
-
-                Fraction f3 = new Fraction(2, 4);
-                Console.WriteLine($"Дробь {f3} упрощена: {f3}"); //Демонстрация упрощения
-
-                //  Fraction f4 = new Fraction(1, 0); // Выбросит исключение
-
-            }
-            catch (NotCorrectlyDenominatorException ex)
-            {
-                Console.WriteLine($"Ошибка знаменателя: {ex.Message}");
-            }
-            catch (DivideByZeroException ex)
-            {
-                Console.WriteLine($"Ошибка деления: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Произошла ошибка: {ex.Message}");
-            }
-
-            Console.ReadKey();
+            numerator = -numerator;
+            denominator = -denominator;
         }
+    }
+
+
+    // Вспомогательный метод для нахождения НОД (наибольшего общего делителя)
+    private int GreatestCommonDivisor(int a, int b)
+    {
+        a = Math.Abs(a);
+        b = Math.Abs(b);
+
+        while (b != 0)
+        {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    // Задание 1: Переопределение ToString() для красивого вывода
+    public override string ToString()
+    {
+        return $"{numerator}/{denominator}";
+    }
+
+    // Задание 1: Методы сложения, вычитания, умножения и деления (переопределенные операторы)
+    public static Fraction operator +(Fraction a, Fraction b)
+    {
+        return new Fraction(a.numerator * b.denominator + b.numerator * a.denominator, a.denominator * b.denominator);
+    }
+
+    public static Fraction operator -(Fraction a, Fraction b)
+    {
+        return new Fraction(a.numerator * b.denominator - b.numerator * a.denominator, a.denominator * b.denominator);
+    }
+
+    public static Fraction operator *(Fraction a, Fraction b)
+    {
+        return new Fraction(a.numerator * b.numerator, a.denominator * b.denominator);
+    }
+
+    public static Fraction operator /(Fraction a, Fraction b)
+    {
+        if (b.numerator == 0)
+        {
+            throw new DivideByZeroException("Деление на ноль!");
+        }
+        return new Fraction(a.numerator * b.denominator, a.denominator * b.numerator);
     }
 }
