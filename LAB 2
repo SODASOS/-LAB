@@ -1,1 +1,111 @@
 
+using System;
+using System.Text.RegularExpressions;
+
+namespace RegularExpressionsLab
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            bool continueRunning = true;
+
+            while (continueRunning)
+            {
+                Console.WriteLine("\nВыберите операцию:");
+                Console.WriteLine("1. Проверка email-адреса");
+                Console.WriteLine("2. Поиск всех дат в формате dd.MM.yyyy");
+                Console.WriteLine("3. Замена всех цифр в тексте на *");
+                Console.WriteLine("4. Разбиение строки по запятым, точкам или пробелам");
+                Console.WriteLine("5. Выход");
+
+                Console.Write("Ваш выбор: ");
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        CheckEmail();
+                        break;
+                    case "2":
+                        FindDates();
+                        break;
+                    case "3":
+                        ReplaceDigits();
+                        break;
+                    case "4":
+                        SplitString();
+                        break;
+                    case "5":
+                        continueRunning = false;
+                        Console.WriteLine("Завершение работы...");
+                        break;
+                    default:
+                        Console.WriteLine("Неверный выбор. Попробуйте еще раз.");
+                        break;
+                }
+            }
+        }
+
+        static void CheckEmail()
+        {
+            Console.Write("Введите email-адрес: ");
+            string email = Console.ReadLine();
+
+            //Простое регулярное выражение для проверки email
+            string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+
+            if (Regex.IsMatch(email, pattern))
+            {
+                Console.WriteLine("Email-адрес соответствует формату.");
+            }
+            else
+            {
+                Console.WriteLine("Email-адрес не соответствует формату.");
+            }
+        }
+
+        static void FindDates()
+        {
+            Console.Write("Введите текст с датами (dd.MM.yyyy): ");
+            string text = Console.ReadLine();
+
+            string pattern = @"\d{2}\.\d{2}\.\d{4}";  //Регулярное выражение для формата dd.MM.yyyy
+
+            MatchCollection matches = Regex.Matches(text, pattern);
+
+            Console.WriteLine("Найденные даты:");
+            foreach (Match match in matches)
+            {
+                Console.WriteLine(match.Value);
+            }
+        }
+
+        static void ReplaceDigits()
+        {
+            Console.Write("Введите текст: ");
+            string text = Console.ReadLine();
+
+            string pattern = @"\d"; //Регулярное выражение для любой цифры
+            string replacedText = Regex.Replace(text, pattern, "*");
+
+            Console.WriteLine("Текст с замененными цифрами:");
+            Console.WriteLine(replacedText);
+        }
+
+        static void SplitString()
+        {
+            Console.Write("Введите строку для разделения (разделители: , . или пробел): ");
+            string text = Console.ReadLine();
+
+            string pattern = @"[,.\s]+"; //Регулярное выражение для запятой, точки или пробела
+            string[] parts = Regex.Split(text, pattern);
+
+            Console.WriteLine("Разделенные части строки:");
+            foreach (string part in parts)
+            {
+                Console.WriteLine(part);
+            }
+        }
+    }
+}
